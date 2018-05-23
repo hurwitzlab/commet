@@ -1,0 +1,42 @@
+BootStrap: docker
+From: ubuntu:latest
+
+%environment
+    PATH=/app/commet:$PATH
+    LD_LIBRARY_PATH=/usr/local/lib
+
+%runscript
+    exec python2.7 /app/commet/Commet.py
+
+%post
+    apt-get update
+    apt-get install -y locales git build-essential python2.7 
+        #autoconf libtool \
+        #wget curl libcurl4-openssl-dev libssl-dev 
+    locale-gen en_US.UTF-8
+
+    #
+    # Put everything into $APP_DIR
+    #
+    export APP_DIR=/app
+    mkdir -p $APP_DIR
+    cd $APP_DIR
+
+    #
+    # Install Jellyfish 
+    #
+    cd $APP_DIR
+    git clone https://github.com/pierrepeterlongo/commet.git
+    cd commet
+    make && make install
+
+    #
+    # Add CRAN to sources to get latest R
+    #
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
+    apt-get install -y r-base r-base-dev
+ 
+    # Mount points for TACC directories
+    mkdir /home1
+    mkdir /scratch
+    mkdir /work
