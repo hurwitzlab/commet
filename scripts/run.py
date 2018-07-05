@@ -3,9 +3,11 @@
 
 import argparse
 import os
+import re
 import sys
 import subprocess
 import tempfile as tmp
+from itertools import permutations
 
 # --------------------------------------------------
 def get_args():
@@ -107,6 +109,47 @@ def make_commet_args(args):
     return commet_args
 
 # --------------------------------------------------
+def get_reads(input_files, out_dir):
+    """Use the Commet bitvector files to extract common reads"""
+    warn('Getting reads')
+
+    bv_files = [fname for fname in os.listdir(out_dir)
+                if fname.endswith('.bv')]
+
+    reads_dir = os.path.join(out_dir, 'shared_reads')
+    warn('reads_dir {}'.format(reads_dir))
+    if not os.path.isdir(reads_dir):
+        os.makedirs(reads_dir)
+
+    job_file = tmp.NamedTemporaryFile(delete=False, mode='wt')
+    job_tmpl = 'extract_reads {} {} -o {}\n'
+
+    for i, (f1, f2) in enumerate(permutations(set(input_files), 2)):
+        b1 = os.path.basename(f1)
+        b2 = os.path.basename(f2)
+        bv_name = '{}_in_{}.bv'.format(b1, b2)
+        if bv_name in bv_files:
+            this_dir = os.path.join(reads_dir, b1)
+            warn('this_dir {}'.format(this_dir))
+            if not os.path.isdir(this_dir):
+                os.makedirs(this_dir)
+            out_file = os.path.join(this_dir, b2)
+            print('{:3}: {}'.format(i, bv_name))
+            job_file.write(job_tmpl.format(f1,
+                                           os.path.join(out_dir, bv_name),
+                                           out_file))
+        else:
+            warn('Missing expected bitvector {}!'.format(os.path.join(out_dir,
+                                                                      bv_name)))
+
+    job_file.close()
+
+    for cmd in open(job_file.name, 'rt'):
+        subprocess.run(cmd.rstrip())
+
+    return True
+
+# --------------------------------------------------
 def main():
     """main"""
     args = get_args()
@@ -136,12 +179,21 @@ def main():
         else:
             die('--query "{}" is not a directory'.format(query_dir))
 
+    if not os.path.isfile(query_set) or os.path.getsize(query_set) == 0:
+        die('Unusable query_set "{}"'.format(query_set))
+
+    input_files = []
+    for line in open(query_set, 'rt'):
+        _, files = re.split(r'\s*:\s*', line.rstrip())
+        input_files.extend(re.split(r'\s*,\s*', files))
+
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
 
     cmd = ['Commet.py'] + make_commet_args(args) + [query_set]
-    warn(cmd)
     subprocess.run(cmd)
+
+    get_reads(input_files, out_dir)
 
     print('Done, see output dir "{}"'.format(os.path.abspath(out_dir)))
 

@@ -2,11 +2,11 @@ BootStrap: docker
 From: ubuntu:latest
 
 %environment
-    PATH=/app/commet:$PATH
+    PATH=/app/commet-src:/app/commet/scripts:$PATH
     LD_LIBRARY_PATH=/usr/local/lib
 
 %runscript
-    cd /app/commet
+    cd /app/commet-src:/app/commet/scripts
     exec python2.7 Commet.py
 
 %post
@@ -14,8 +14,6 @@ From: ubuntu:latest
     apt-get install -y gnupg
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
     apt-get install -y r-base r-base-dev locales git build-essential python2.7 
-        #autoconf libtool \
-        #wget curl libcurl4-openssl-dev libssl-dev 
     locale-gen en_US.UTF-8
 
     cd /usr/bin
@@ -28,12 +26,14 @@ From: ubuntu:latest
     mkdir -p $APP_DIR
     cd $APP_DIR
 
+    git clone https://github.com/hurwitzlab/commet.git
+
     #
-    # Install Jellyfish 
+    # Install Commet 
     #
     cd $APP_DIR
-    git clone https://github.com/hurwitzlab/commet-src.git commet
-    cd commet
+    git clone https://github.com/hurwitzlab/commet-src.git commet-src
+    cd commet-src
     make 
     make install
     cp heatmap.r dendro.R /usr/local/bin
@@ -48,7 +48,7 @@ local({
   options(repos = r)
 })
 EOF
-    Rscript /app/commet/install.r
+    Rscript /app/commet-src/install.r
 
     # Mount points for TACC directories
     mkdir /home1

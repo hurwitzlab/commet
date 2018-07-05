@@ -15,4 +15,7 @@ img: clean
 	sudo $(SINGULARITY) bootstrap $(IMG_NAME) $(DEF_NAME)
 
 shell:
-	sudo $(SINGULARITY) shell --writable -B $(shell pwd):/home $(IMG_NAME)
+	sudo $(SINGULARITY) shell --writable -B $(HOME):/home1 -B /data:/work $(IMG_NAME)
+
+pooled:
+	sudo $(SINGULARITY) exec -B $(HOME):/home1 -B /data:/work $(IMG_NAME) run.py
