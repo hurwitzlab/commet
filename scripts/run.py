@@ -84,6 +84,19 @@ def die(msg='Something bad happened'):
     sys.exit(1)
 
 # --------------------------------------------------
+def line_count(fname):
+    """Count the number of lines in a file"""
+
+    if not os.path.isfile(fname):
+        die('"{}" is not a file'.format(fname))
+
+    n = 0
+    for _ in open(fname):
+        n += 1
+
+    return n
+
+# --------------------------------------------------
 def make_commet_args(args):
     """Turn user args to Commet args"""
     commet_args = ['-o', args.out_dir, '-b', '/usr/local/bin']
@@ -129,12 +142,11 @@ def get_reads(input_files, out_dir):
         b2 = os.path.basename(f2)
         bv_name = '{}_in_{}.bv'.format(b1, b2)
         if bv_name in bv_files:
-            this_dir = os.path.join(reads_dir, b1)
-            warn('this_dir {}'.format(this_dir))
+            this_dir = os.path.join(reads_dir, b2)
             if not os.path.isdir(this_dir):
                 os.makedirs(this_dir)
-            out_file = os.path.join(this_dir, b2)
-            print('{:3}: {}'.format(i, bv_name))
+            out_file = os.path.join(this_dir, b1)
+            print('{:3}: {}'.format(i+1, bv_name))
             job_file.write(job_tmpl.format(f1,
                                            os.path.join(out_dir, bv_name),
                                            out_file))
@@ -144,8 +156,19 @@ def get_reads(input_files, out_dir):
 
     job_file.close()
 
-    for cmd in open(job_file.name, 'rt'):
-        subprocess.run(cmd.rstrip().split(' '))
+    num_jobs = line_count(job_file.name)
+    num_procs = 4
+
+    if num_jobs > 0:
+        cmd = 'parallel -j {} --halt soon,fail=1 < {}'.format(num_procs,
+                                                              job_file.name)
+
+        try:
+            subprocess.run(cmd)
+        except subprocess.CalledProcessError as err:
+            die('Error:\n{}\n{}\n'.format(err.stderr, err.stdout))
+        finally:
+            os.remove(job_file.name)
 
     return True
 
