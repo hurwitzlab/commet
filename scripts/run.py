@@ -145,7 +145,7 @@ def get_reads(input_files, out_dir):
     job_file.close()
 
     for cmd in open(job_file.name, 'rt'):
-        subprocess.run(cmd.rstrip())
+        subprocess.run(cmd.rstrip().split(' '))
 
     return True
 
