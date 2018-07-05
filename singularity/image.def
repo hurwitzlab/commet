@@ -6,14 +6,20 @@ From: ubuntu:latest
     LD_LIBRARY_PATH=/usr/local/lib
 
 %runscript
-    exec python2.7 /app/commet/Commet.py
+    cd /app/commet
+    exec python2.7 Commet.py
 
 %post
     apt-get update
-    apt-get install -y locales git build-essential python2.7 
+    apt-get install -y gnupg
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
+    apt-get install -y r-base r-base-dev locales git build-essential python2.7 
         #autoconf libtool \
         #wget curl libcurl4-openssl-dev libssl-dev 
     locale-gen en_US.UTF-8
+
+    cd /usr/bin
+    ln -s python2.7 python
 
     #
     # Put everything into $APP_DIR
@@ -26,16 +32,24 @@ From: ubuntu:latest
     # Install Jellyfish 
     #
     cd $APP_DIR
-    git clone https://github.com/pierrepeterlongo/commet.git
+    git clone https://github.com/hurwitzlab/commet-src.git commet
     cd commet
-    make && make install
+    make 
+    make install
+    cp heatmap.r dendro.R /usr/local/bin
 
     #
-    # Add CRAN to sources to get latest R
+    # Install R modules (need the .Rprofile to indicate CRAN mirror)
     #
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
-    apt-get install -y r-base r-base-dev
- 
+    cat << EOF > .Rprofile
+local({
+  r = getOption("repos")
+  r["CRAN"] = "http://mirrors.nics.utk.edu/cran/"
+  options(repos = r)
+})
+EOF
+    Rscript /app/commet/install.r
+
     # Mount points for TACC directories
     mkdir /home1
     mkdir /scratch
