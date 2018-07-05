@@ -130,7 +130,6 @@ def get_reads(input_files, out_dir):
                 if fname.endswith('.bv')]
 
     reads_dir = os.path.join(out_dir, 'shared_reads')
-    warn('reads_dir {}'.format(reads_dir))
     if not os.path.isdir(reads_dir):
         os.makedirs(reads_dir)
 
