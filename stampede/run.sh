@@ -66,6 +66,15 @@ while getopts :k:o:q:Q:h OPT; do
     esac
 done
 
+if [[ -z "$OUT_DIR" ]]; then
+    echo "-o OUT_DIR is required"
+    exit 1
+fi
+
+if [[ ! -d "$OUT_DIR" ]]; then
+    mkdir -p "$OUT_DIR"
+fi
+
 if [[ -n "$QUERY" ]]; then
     INPUT_FILES=$(mktemp)
     for QRY in $QUERY; do
@@ -78,13 +87,12 @@ if [[ -n "$QUERY" ]]; then
         fi
     done
 
-    QUERY_SET="$$.query.set"
+    QUERY_SET="$OUT_DIR/$$.query.set"
     cat /dev/null > "$QUERY_SET"
     i=0
     while read -r FILE; do
-        i=$((i+1))
         if [[ -f "$FILE" ]]; then
-            echo "Q${i}:$FILE" >> "$QUERY_SET"
+            echo "$(basename $FILE):$FILE" >> "$QUERY_SET"
         else
             echo "FILE \"$FILE\" is not a valid file"
         fi
@@ -101,16 +109,9 @@ if [[ ! -f "$QUERY_SET" ]]; then
     exit 1
 fi
 
-if [[ -z "$OUT_DIR" ]]; then
-    echo "-o OUT_DIR is required"
-    exit 1
-fi
-
-if [[ ! -d "$OUT_DIR" ]]; then
-    mkdir -p "$OUT_DIR"
-fi
-
 echo "Running COMMET"
 singularity exec $IMG Commet.py -k "$KMER_SIZE" -o "$OUT_DIR" -b /usr/local/bin "$QUERY_SET"
+
+singularity exec $IMG Commet_analysis.py -o "$OUT_DIR" -b /usr/local/bin "$QUERY_SET"
 echo "Done."
 echo "Comments to Ken Youens-Clark <kyclark@email.arizona.edu>"

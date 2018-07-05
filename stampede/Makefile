@@ -20,4 +20,7 @@ test: clean
 	sbatch test.sh
 
 mrsa:
-	sbatch -J cmtmrsa -p development -t 02:00:00 ./run.sh -q $(WORK)/data/bugs/mssa_mrsa/ -o $(WORK)/data/bug/commet-mrsa 
+	sbatch -J cmtmrsa ./run.sh -q $(WORK)/data/bugs/mssa_mrsa/ -o $(WORK)/data/bugs/commet-mrsa 
+
+lakea:
+	sbatch -J lakea ./run.sh -q $(WORK)/myriam/filtered -o $(WORK)/myriam/commet-out
