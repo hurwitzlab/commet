@@ -164,7 +164,7 @@ def get_reads(input_files, out_dir):
                                                               job_file.name)
 
         try:
-            subprocess.run(cmd)
+            subprocess.run(cmd, shell=True, check=True)
         except subprocess.CalledProcessError as err:
             die('Error:\n{}\n{}\n'.format(err.stderr, err.stdout))
         finally:
