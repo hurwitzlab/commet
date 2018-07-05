@@ -154,7 +154,7 @@ def get_reads(input_files, out_dir):
             msg = 'Missing expected bitvector {}!'
             warn(msg.format(os.path.join(out_dir, bv_name)))
 
-    for i, fname in set(input_files):
+    for i, fname in enumerate(set(input_files)):
         basename = os.path.basename(fname)
         bv_name = basename + '.bv'
         if bv_name in bv_files:
