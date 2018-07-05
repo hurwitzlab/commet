@@ -136,6 +136,7 @@ def get_reads(input_files, out_dir):
     job_file = tmp.NamedTemporaryFile(delete=False, mode='wt')
     job_tmpl = 'extract_reads {} {} -o {}\n'
 
+
     for i, (f1, f2) in enumerate(permutations(set(input_files), 2)):
         b1 = os.path.basename(f1)
         b2 = os.path.basename(f2)
@@ -150,8 +151,18 @@ def get_reads(input_files, out_dir):
                                            os.path.join(out_dir, bv_name),
                                            out_file))
         else:
-            warn('Missing expected bitvector {}!'.format(os.path.join(out_dir,
-                                                                      bv_name)))
+            msg = 'Missing expected bitvector {}!'
+            warn(msg.format(os.path.join(out_dir, bv_name)))
+
+    for i, fname in set(input_files):
+        basename = os.path.basename(fname)
+        bv_name = basename + '.bv'
+        if bv_name in bv_files:
+            out_file = os.path.join(reads_dir, basename, basename)
+            print('{:3}: {}'.format(i+1, basename))
+            job_file.write(job_tmpl.format(fname,
+                                           os.path.join(out_dir, bv_name),
+                                           out_file))
 
     job_file.close()
 

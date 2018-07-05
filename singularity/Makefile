@@ -18,4 +18,5 @@ shell:
 	sudo $(SINGULARITY) shell --writable -B $(HOME):/home1 -B /data:/work $(IMG_NAME)
 
 pooled:
-	sudo $(SINGULARITY) exec -B $(HOME):/home1 -B /data:/work $(IMG_NAME) run.py
+	sudo $(SINGULARITY) exec -B $(HOME):/home1 -B /data:/work $(IMG_NAME) \
+	run.py -q /work/kyclark/myriam/pooled -o /work/kyclark/myriam/pooled-commet
