@@ -22,6 +22,10 @@ def get_args():
                         type=str,
                         default='')
 
+    parser.add_argument('-x', '--extract_shared_reads',
+                        help='Extract shared reads',
+                        action='store_true')
+
     parser.add_argument('-Q', '--query_set',
                         help='File describing sets for Commet',
                         metavar='str',
@@ -169,9 +173,6 @@ def get_reads(input_files, out_dir):
 
     job_file.close()
 
-    for i, line in enumerate(open(job_file.name)):
-        print('{:3}: {}'.format(i+1, line.rstrip()))
-
     num_jobs = line_count(job_file.name)
     num_procs = 4
 
@@ -234,7 +235,8 @@ def main():
     cmd = ['Commet.py'] + make_commet_args(args) + [query_set]
     subprocess.run(cmd)
 
-    get_reads(input_files, out_dir)
+    if args.extract_shared_reads:
+        get_reads(input_files, out_dir)
 
     print('Done, see output dir "{}"'.format(os.path.abspath(out_dir)))
 
