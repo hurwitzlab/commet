@@ -169,7 +169,7 @@ def get_reads(input_files, out_dir):
 
     job_file.close()
 
-    for i, line in open(job_file.name):
+    for i, line in enumerate(open(job_file.name)):
         print('{:3}: {}'.format(i+1, line.rstrip()))
 
     num_jobs = line_count(job_file.name)
