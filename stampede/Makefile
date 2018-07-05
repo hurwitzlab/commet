@@ -24,3 +24,6 @@ mrsa:
 
 lakea:
 	sbatch -J lakea ./run.sh -q $(WORK)/myriam/filtered -o $(WORK)/myriam/commet-out
+
+pooled:
+	sbatch -J pooled ./run.sh -q $(WORK)/myriam/filtered-pooled -o $(WORK)/myriam/commet-filtered
