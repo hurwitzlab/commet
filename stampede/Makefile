@@ -22,5 +22,5 @@ test: clean
 mrsa:
 	sbatch -J cmtmrsa ./run.sh -q $(WORK)/data/bugs/mssa_mrsa/ -o $(WORK)/data/bugs/commet-mrsa 
 
-lakea:
-	sbatch -J lakea ./run.sh -q $(WORK)/myriam/filtered -o $(WORK)/myriam/commet-out
+pooled:
+	./run.sh -q /data/kyclark/myriam/pooled -o /data/kyclark/myriam/pooled-commet
