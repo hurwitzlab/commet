@@ -69,7 +69,7 @@ def main():
 
     for i, (f1, f2) in enumerate(permutations(fasta_files, 2)):
         bv_name = '{}_in_{}.bv'.format(f1, f2)
-        print('{:3}: {} {}'.format(i, bv_ name))
+        print('{:3}: {} {}'.format(i, bv_name))
         if bv_name not in bv_files:
             warn('Missing!')
             continue
