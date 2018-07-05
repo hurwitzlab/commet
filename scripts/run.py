@@ -137,7 +137,9 @@ def get_reads(input_files, out_dir):
     job_tmpl = 'extract_reads {} {} -o {}\n'
 
 
-    for i, (f1, f2) in enumerate(permutations(set(input_files), 2)):
+    read_file_num = 0
+    for f1, f2 in permutations(set(input_files), 2):
+        read_file_num += 1
         b1 = os.path.basename(f1)
         b2 = os.path.basename(f2)
         bv_name = '{}_in_{}.bv'.format(b1, b2)
@@ -146,7 +148,7 @@ def get_reads(input_files, out_dir):
             if not os.path.isdir(this_dir):
                 os.makedirs(this_dir)
             out_file = os.path.join(this_dir, b1)
-            print('{:3}: {}'.format(i+1, bv_name))
+            print('{:3}: {} => {}'.format(read_file_num, bv_name, out_file))
             job_file.write(job_tmpl.format(f1,
                                            os.path.join(out_dir, bv_name),
                                            out_file))
@@ -154,12 +156,13 @@ def get_reads(input_files, out_dir):
             msg = 'Missing expected bitvector {}!'
             warn(msg.format(os.path.join(out_dir, bv_name)))
 
-    for i, fname in enumerate(set(input_files)):
+    for fname in set(input_files):
+        read_file_num += 1
         basename = os.path.basename(fname)
         bv_name = basename + '.bv'
         if bv_name in bv_files:
             out_file = os.path.join(reads_dir, basename, basename)
-            print('{:3}: {}'.format(i+1, basename))
+            print('{:3}: {} => {}'.format(read_file_num, basename, out_file))
             job_file.write(job_tmpl.format(fname,
                                            os.path.join(out_dir, bv_name),
                                            out_file))
@@ -170,6 +173,8 @@ def get_reads(input_files, out_dir):
     num_procs = 4
 
     if num_jobs > 0:
+        print('Processing {} jobs @ {}'.format(num_jobs, num_procs))
+
         cmd = 'parallel -j {} --halt soon,fail=1 < {}'.format(num_procs,
                                                               job_file.name)
 
