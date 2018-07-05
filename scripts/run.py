@@ -84,25 +84,25 @@ def die(msg='Something bad happened'):
 # --------------------------------------------------
 def make_commet_args(args):
     """Turn user args to Commet args"""
-    commet_args = ['-o "{}"'.format(args.out_dir), '-b /usr/local/bin']
+    commet_args = ['-o', args.out_dir, '-b', '/usr/local/bin']
 
     if args.kmer_size is not None:
-        commet_args.append('-k {}'.format(args.kmer_size))
+        commet_args.extend('-k', str(args.kmer_size))
 
     if args.min_num_shared_kmers is not None:
-        commet_args.append('-t {}'.format(args.min_num_shared_kmers))
+        commet_args.extend('-t', str(args.min_num_shared_kmers))
 
     if args.min_len_keep_read is not None:
-        commet_args.append('-l {}'.format(args.min_len_keep_read))
+        commet_args.extend('-l', str(args.min_len_keep_read))
 
     if args.max_num_ns_keep_read is not None:
-        commet_args.append('-n {}'.format(args.max_num_ns_keep_read))
+        commet_args.extend('-n', str(args.max_num_ns_keep_read))
 
     if args.min_shannon_keep_read is not None:
-        commet_args.append('-e {}'.format(args.min_shannon_keep_read))
+        commet_args.extend('-e', str(args.min_shannon_keep_read))
 
     if args.max_num_selected_reads is not None:
-        commet_args.append('-m {}'.format(args.max_num_selected_reads))
+        commet_args.extend('-m', str(args.max_num_selected_reads))
 
     return commet_args
 
@@ -139,8 +139,7 @@ def main():
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
 
-    commet_args = make_commet_args(args)
-    cmd = ' '.join(['Commet.py'] + commet_args + [query_set])
+    cmd = ['Commet.py'] + make_commet_args(args) + [query_set]
     warn(cmd)
     subprocess.run(cmd)
 
