@@ -4,7 +4,7 @@ EMAIL = kyclark@email.arizona.edu
 clean:
 	find . \( -name \*.out -o -name \*.param \) -exec rm {} \;
 
-up: 
+up:
 	copy_from_manifest.py
 
 template:
@@ -20,7 +20,7 @@ test: clean
 	sbatch test.sh
 
 mrsa:
-	sbatch -J cmtmrsa ./run.sh -q $(WORK)/data/bugs/mssa_mrsa/ -o $(WORK)/data/bugs/commet-mrsa 
+	sbatch -J cmtmrsa ./run.sh -q $(WORK)/data/bugs/mssa_mrsa/ -o $(WORK)/data/bugs/commet-mrsa
 
 lakea:
 	sbatch -J lakea ./run.sh -q $(WORK)/myriam/filtered -o $(WORK)/myriam/commet-out
