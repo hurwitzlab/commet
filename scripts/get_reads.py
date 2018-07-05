@@ -4,6 +4,7 @@
 import argparse
 import os
 import sys
+from itertools import permutations
 
 # --------------------------------------------------
 def get_args():
@@ -61,7 +62,19 @@ def main():
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
 
+    fasta_files = os.listdir(fasta_dir)
+    print(fasta_files)
+
     bv_files = [fname for fname in os.listdir(bv_dir) if fname.endswith('.bv')]
+
+    for i, (f1, f2) in enumerate(permutations(fasta_files, 2)):
+        bv_name = '{}_in_{}.bv'.format(f1, f2)
+        print('{:3}: {} {}'.format(i, bv_ name))
+        if bv_name not in bv_files:
+            warn('Missing!')
+            continue
+
+        
 
     print(bv_files)
 
